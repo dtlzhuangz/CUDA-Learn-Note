@@ -8,7 +8,7 @@ torch.set_grad_enabled(False)
 
 # Load the CUDA kernel as a python module
 lib = load(name='elementwise_lib', 
-           sources=['elementwise.cu'], 
+           sources=['my_elementwise.cu'], 
            extra_cuda_cflags=[
                "-O3",
                 "-U__CUDA_NO_HALF_OPERATORS__",
@@ -66,17 +66,17 @@ for (S, K) in SKs:
     a = torch.randn((S, K)).cuda().float().contiguous()
     b = torch.randn((S, K)).cuda().float().contiguous()
     c = torch.zeros_like(a).cuda().float().contiguous()
-    # run_benchmark(lib.elementwise_add_f32,   a, b, "f32",   c)
-    # run_benchmark(lib.elementwise_add_f32x4, a, b, "f32x4", c)
-    # run_benchmark(partial(torch.add, out=c), a, b, "f32_th")
+    # run_benchmark(lib.elementwise_add_f32,   a, b, "f32")
+    # run_benchmark(lib.elementwise_add_f32x4, a, b, "f32x4")
+    # run_benchmark(torch.add, a, b, "f32_th")
 
     print("-" * 85)
     a_f16 = a.half().contiguous()
     b_f16 = b.half().contiguous()
     c_f16 = c.half().contiguous()
-    run_benchmark(lib.elementwise_add_f16,        a_f16, b_f16, "f16",       c_f16)
-    run_benchmark(lib.elementwise_add_f16x2,      a_f16, b_f16, "f16x2",     c_f16)
-    run_benchmark(lib.elementwise_add_f16x8,      a_f16, b_f16, "f16x8",     c_f16)
-    run_benchmark(lib.elementwise_add_f16x8_pack, a_f16, b_f16, "f16x8pack", c_f16)
+    run_benchmark(lib.elementwise_add_f16,        a_f16, b_f16, "f16", c_f16)
+    run_benchmark(lib.elementwise_add_f16x2,      a_f16, b_f16, "f16x2", c_f16)
+    run_benchmark(lib.elementwise_add_f16x8,      a_f16, b_f16, "f16x8", c_f16)
+    # run_benchmark(lib.elementwise_add_f16x8_pack, a_f16, b_f16, "f16x8pack", c_f16)
     run_benchmark(partial(torch.add, out=c_f16),  a_f16, b_f16, "f16_th")
     print("-" * 85)
